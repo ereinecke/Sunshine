@@ -10,11 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 
 public class MainActivity extends ActionBarActivity {
 
@@ -22,8 +20,12 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new PlaceholderFragment())
+                    .commit();
+        }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -59,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+                Bundle savedInstanceState) {
 
             // Create some dummy data for the ListView.  Here's a sample weekly forecast
             String[] data = {
@@ -78,7 +80,7 @@ public class MainActivity extends ActionBarActivity {
                 new ArrayAdapter<String>(
                     getActivity(), // current context, this activity
                     R.layout.list_item_forecast,  // name of layout ID
-                    R.id.list_item_forecast_textview  , // the ID of textview
+                    R.id.list_item_forecast_textview, // the ID of textview
                     weekForecast);
 
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -88,7 +90,6 @@ public class MainActivity extends ActionBarActivity {
             listView.setAdapter(mForecastAdapter);
 
             return rootView;
-
         }
     }
 }
