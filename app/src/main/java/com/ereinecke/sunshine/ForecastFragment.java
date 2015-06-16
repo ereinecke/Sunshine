@@ -1,9 +1,12 @@
 package com.ereinecke.sunshine;
 
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -13,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -29,7 +33,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * ForecastFragment
@@ -39,7 +42,10 @@ public class ForecastFragment extends Fragment {
 
     private ArrayAdapter<String> mForecastAdapter;
 
-    private final String postalCode = "37700,mx";
+    public ForecastFragment() {
+    }
+
+    private String postalCode = "37700,mx";
     private final String dataFormat = "json";
     private final String weatherUnits = "metric";
     private final String forecastDays = "10";
@@ -65,8 +71,7 @@ public class ForecastFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute();
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -76,42 +81,61 @@ public class ForecastFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        // Create some dummy data for the ListView.  Here's a sample weekly forecast
-        String[] data = {
-                "Sun 6/7 - Partly Cloudy - 85/57",
-                "Mon 6/8 - Partly Cloudy - 84/50",
-                "Tue 6/9 - Partly Cloudy - 84/50",
-                "Wed 6/10 - Partly Cloudy - 84/53",
-                "Thu 6/11 - Sunny - 85/55",
-                "Fri 6/12 - Thundershowers - 83/56",
-                "Sat 6/13 - Partly Cloudy - 84/53"
-        };
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
-
         /* Create ArrayAdapter to display dummy forecast data */
         mForecastAdapter =
                 new ArrayAdapter<String>(
                         getActivity(), // current context, this activity
                         R.layout.list_item_forecast,  // name of layout ID
                         R.id.list_item_forecast_textview, // the ID of textview
-                        weekForecast);
+                        new ArrayList<String>());
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
+        // set up listener for clicking on an item in the ListView
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Create and intent and pass it the position in the ListView
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class)
+                    .putExtra(Intent.EXTRA_TEXT,  mForecastAdapter.getItem(position))
+                    .putExtra("forecastDay", position);
+                startActivity(detailIntent);
+            }
+        });
 
         return rootView;
     }
 
+    private void updateWeather() {
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        String location = PreferenceManager.getDefaultSharedPreferences(getActivity())
+            .getString(getString(R.string.pref_location_key),
+                       getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
 
-    public class FetchWeatherTask extends AsyncTask<Void, Void, String[]> {
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
+    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         @Override
-        protected String[] doInBackground(Void... params) {
+        protected String[] doInBackground(String... params) {
+
+            // If there's no zip code, there's nothing to look up.  Verify size of params.
+            if (params.length == 0) {
+                return null;
+            }
+
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -126,8 +150,8 @@ public class ForecastFragment extends Fragment {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are available at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-                // URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=37700,mx&mode=json&units=metric&cnt=7");
-                URL url = new URL(BuildForecastURL(postalCode));
+
+                URL url = new URL(BuildForecastURL(params[0]));
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -156,13 +180,10 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
-
-                Log.v(LOG_TAG, "Forecast JSON: " + forecastJsonStr);
-
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attempting
-                // to parse it.
+                // If the code didn't successfully get the weather data, there's no 
+                // point in attempting to parse it.
                 return null;
 
             } finally {
@@ -194,8 +215,6 @@ public class ForecastFragment extends Fragment {
         }
     }
 
-
-
     private String BuildForecastURL(String postalCode) {
         // URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=37700,mx&mode=json&units=metric&cnt=7");
         final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
@@ -209,13 +228,13 @@ public class ForecastFragment extends Fragment {
                 .appendQueryParameter("units", weatherUnits)
                 .appendQueryParameter("cnt", forecastDays);
         builder.build();
-        Log.v(LOG_TAG, "url: " + builder.toString());
+        // Log.v(LOG_TAG, "url: " + builder.toString());
 
         return builder.toString();
     }
     /* The date/time conversion code is going to be moved outside the asynctask later,
- * so for convenience we're breaking it out into its own method now.
- */
+     * so for convenience we're breaking it out into its own method now.
+     */
     private String getReadableDateString(long time){
         // Because the API returns a unix timestamp (measured in seconds),
         // it must be converted to milliseconds in order to be converted to valid date.
@@ -298,17 +317,28 @@ public class ForecastFragment extends Fragment {
             // Temperatures are in a child object called "temp".  Try not to name variables
             // "temp" when working with temperature.  It confuses everybody.
             JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-            double high = temperatureObject.getDouble(OWM_MAX);
-            double low = temperatureObject.getDouble(OWM_MIN);
+            double high = tempConversion(temperatureObject.getDouble(OWM_MAX));
+            double low  = tempConversion(temperatureObject.getDouble(OWM_MIN));
 
             highAndLow = formatHighLows(high, low);
             resultStrs[i] = day + " - " + description + " - " + highAndLow;
         }
 
         for (String s : resultStrs) {
-            Log.v(LOG_TAG, "Forecast entry: " + s);
+            // Log.v(LOG_TAG, "Forecast entry: " + s);
         }
         return resultStrs;
 
+    }
+
+    // Convert to Imperial units based on preferences setting
+    private double tempConversion(double temp) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String unitsPref = sharedPref.getString(getString(R.string.pref_units_key), "");
+
+        if (unitsPref == getString(R.string.pref_units_imperial)) {
+            return (temp * 1.8) + 32;
+        }
+        else return temp;
     }
 }
