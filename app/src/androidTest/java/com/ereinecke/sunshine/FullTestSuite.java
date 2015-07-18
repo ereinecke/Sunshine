@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ereinecke.sunshine.data;
+package com.ereinecke.sunshine;
 
 import android.test.suitebuilder.TestSuiteBuilder;
 

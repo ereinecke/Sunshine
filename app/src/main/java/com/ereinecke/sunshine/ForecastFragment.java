@@ -83,7 +83,7 @@ public class ForecastFragment extends Fragment {
 
         /* Create ArrayAdapter to display dummy forecast data */
         mForecastAdapter =
-                new ArrayAdapter<String>(
+                new ArrayAdapter<>(
                         getActivity(), // current context, this activity
                         R.layout.list_item_forecast,  // name of layout ID
                         R.id.list_item_forecast_textview, // the ID of textview
@@ -160,7 +160,7 @@ public class ForecastFragment extends Fragment {
 
                 // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 if (inputStream == null) {
                     // Nothing to do.
                     return null;
@@ -201,7 +201,6 @@ public class ForecastFragment extends Fragment {
                     } catch (JSONException e) {
                         Log.e(LOG_TAG, e.getMessage(), e);
                         e.printStackTrace();
-                        return null;
                     }
                 }
             }
@@ -211,7 +210,7 @@ public class ForecastFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] strings) {
             mForecastAdapter.clear();
-            mForecastAdapter.addAll(new ArrayList<String>(Arrays.asList(strings)));
+            mForecastAdapter.addAll(new ArrayList<>(Arrays.asList(strings)));
         }
     }
 
@@ -324,9 +323,9 @@ public class ForecastFragment extends Fragment {
             resultStrs[i] = day + " - " + description + " - " + highAndLow;
         }
 
-        for (String s : resultStrs) {
-            // Log.v(LOG_TAG, "Forecast entry: " + s);
-        }
+        // for (String s : resultStrs) {
+        //     Log.v(LOG_TAG, "Forecast entry: " + s);
+        //}
         return resultStrs;
 
     }

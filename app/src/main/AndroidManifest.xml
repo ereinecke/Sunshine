@@ -33,5 +33,9 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.ereinecke.sunshine.MainActivity" />
-        </activity>    </application>
+        </activity>
+        <provider
+            android:authorities="com.ereinecke.sunshine"
+            android:name=".data.WeatherProvider" />
+    </application>
 </manifest>
