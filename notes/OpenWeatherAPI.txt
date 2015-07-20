@@ -22,7 +22,7 @@ Can also query by postal code as follows: 37700,MX
 10-day forecast for SMA, metric, spanish:
 http://api.openweathermap.org/data/2.5/forecast/daily?q=37700,mx&cnt=10&lang=es&mode=json
 
-
+	
 
 
 
