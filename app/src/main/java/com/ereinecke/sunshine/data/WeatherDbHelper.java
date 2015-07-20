@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import com.ereinecke.sunshine.data.WeatherContract.WeatherEntry;
 /**
  * Manages a local database for weather data.
  */
-class WeatherDbHelper extends SQLiteOpenHelper {
+public class WeatherDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
     private static final int DATABASE_VERSION = 2;
