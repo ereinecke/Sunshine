@@ -93,8 +93,23 @@ public class ForecastAdapter extends CursorAdapter {
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        // Get icon (placeholder only for now)
-        viewHolder.iconView.setImageResource(R.mipmap.ic_launcher);
+        // Choose the layout type
+        int viewType = getItemViewType(cursor.getPosition());
+        int layoutId = -1;
+
+        // Read weather condition from Cursor
+        int condition = Integer.parseInt(cursor.getString(ForecastFragment.COL_WEATHER_CONDITION_ID));
+
+        switch(viewType) {
+            case VIEW_TYPE_TODAY: {
+                viewHolder.iconView.setImageResource(Utility.getWeatherConditionArt(condition));
+                break;
+            }
+            case VIEW_TYPE_FUTURE_DAY: {
+                viewHolder.iconView.setImageResource(Utility.getWeatherConditionIcon(condition));
+                break;
+            }
+        }
 
         // Read date from cursor
         long dateInMillis = Long.parseLong(cursor.getString(ForecastFragment.COL_WEATHER_DATE));
@@ -109,11 +124,11 @@ public class ForecastAdapter extends CursorAdapter {
 
         // Read high temperature from cursor
         double high = cursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
-        viewHolder.highTempView.setText(Utility.formatTemperature(high, isMetric));
+        viewHolder.highTempView.setText(Utility.formatTemperature(context, high, isMetric));
 
         // Read low temperature from cursor
         double low = cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP);
-        viewHolder.lowTempView.setText(Utility.formatTemperature(low, isMetric));
+        viewHolder.lowTempView.setText(Utility.formatTemperature(context, low, isMetric));
     }
 
     @Override

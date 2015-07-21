@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sunshine</string>
+    <string name="action_map">Ubicación</string>
+    <string name="action_refresh" translatable="false">Actualizar</string>
+    <string name="pref_location_label">Ubicación</string>
+    <string name="pref_metric_label">Métrico</string>
+    <string name="pref_units_label">Unidades</string>
+    <string name="pref_imperial_label">Imperial (\u2109)</string>
+    <string name="title_activity_detail">Detalles</string>
+    <string name="title_activity_settings">Configuración</string>
+    <string name="today">Hoy</string>
+    <string name="tomorrow">Mañana</string>
+    <string name="action_settings">Configuración</string>
+    <string name="action_share">Compartir</string>
+</resources>

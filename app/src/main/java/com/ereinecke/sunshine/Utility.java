@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Utility {
+
     public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(context.getString(R.string.pref_location_key),
@@ -34,17 +35,18 @@ public class Utility {
 
     public static boolean isMetric(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(R.string.pref_units_key), context.getString(R.string.pref_units_metric)).equals(context.getString(R.string.pref_units_metric));
+        return prefs.getString(context.getString(R.string.pref_units_key),
+                context.getString(R.string.pref_units_metric)).equals(context.getString(R.string.pref_units_metric));
     }
 
-    static String formatTemperature(double temperature, boolean isMetric) {
+    static String formatTemperature(Context context, double temperature, boolean isMetric) {
         double temp;
         if ( !isMetric ) {
             temp = 9*temperature/5+32;
         } else {
             temp = temperature;
         }
-        return String.format("%.0f", temp);
+        return context.getString(R.string.format_temperature, temp);
     }
 
     static String formatDate(long dateInMillis) {
@@ -102,7 +104,7 @@ public class Utility {
      *
      * @param context Context to use for resource localization
      * @param dateInMillis The date in milliseconds
-     * @return
+     * @return the name to be used for a day.
      */
     public static String getDayName(Context context, long dateInMillis) {
         // If the date is today, return the localized version of "Today" instead of the actual
@@ -114,7 +116,7 @@ public class Utility {
         int currentJulianDay = Time.getJulianDay(System.currentTimeMillis(), t.gmtoff);
         if (julianDay == currentJulianDay) {
             return context.getString(R.string.today);
-        } else if ( julianDay == currentJulianDay +1 ) {
+        } else if ( julianDay == currentJulianDay + 1) {
             return context.getString(R.string.tomorrow);
         } else {
             Time time = new Time();
@@ -137,7 +139,82 @@ public class Utility {
         time.setToNow();
         SimpleDateFormat dbDateFormat = new SimpleDateFormat(Utility.DATE_FORMAT);
         SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd");
-        String monthDayString = monthDayFormat.format(dateInMillis);
-        return monthDayString;
+        return monthDayFormat.format(dateInMillis);
     }
+
+    public static String getFormattedWind(Context context, float windSpeed, float degrees) {
+        int windFormat;
+        // windSpeed is reported in m/sec, so convert
+        if (Utility.isMetric(context)) {
+            windFormat = R.string.format_wind_kmh;
+            windSpeed = 2.777777777778f * windSpeed;
+        } else {
+            windFormat = R.string.format_wind_mph;
+            windSpeed = 4.47038888889f * windSpeed;
+        }
+
+        // From wind direction in degrees, determine compass direction as a string (e.g NW)
+        // You know what's fun, writing really long if/else statements with tons of possible
+        // conditions.  Seriously, try it!
+        String direction = "Unknown";
+        if (degrees >= 337.5 || degrees < 22.5) {
+            direction = "N";
+        } else if (degrees >= 22.5 && degrees < 67.5) {
+            direction = "NE";
+        } else if (degrees >= 67.5 && degrees < 112.5) {
+            direction = "E";
+        } else if (degrees >= 112.5 && degrees < 157.5) {
+            direction = "SE";
+        } else if (degrees >= 157.5 && degrees < 202.5) {
+            direction = "S";
+        } else if (degrees >= 202.5 && degrees < 247.5) {
+            direction = "SW";
+        } else if (degrees >= 247.5 && degrees < 292.5) {
+            direction = "W";
+        } else if (degrees >= 292.5) {
+            direction = "NW";
+        }
+        return String.format(context.getString(windFormat), windSpeed, direction);
+    }
+
+    /**
+     * Get the appropriate weather condition drawable icon (small, monochrome)
+     * @param condition: weather condition code as downloaded from OWM
+     * @return integer reference to drawable. -1 if not found.
+     */
+    public static int getWeatherConditionIcon(int condition) {
+
+        if (condition < 200 || condition >= 900) return -1;
+
+        else if (condition >= 200 && condition <= 233) return R.drawable.ic_storm;
+        else if (condition >= 300 && condition <= 321) return R.drawable.ic_light_rain;
+        else if (condition >= 500 && condition <= 531) return R.drawable.ic_rain;
+        else if (condition >= 600 && condition <= 622) return R.drawable.ic_snow;
+        else if (condition >= 700 && condition <= 781) return R.drawable.ic_fog;
+        else if (condition == 800)                     return R.drawable.ic_clear;
+        else if (condition == 801)                     return R.drawable.ic_light_clouds;
+        else if (condition >= 802 && condition <= 804) return R.drawable.ic_cloudy;
+        else    return -1;
+    }
+
+    /**
+     * Get the appropriate weather condition drawable artwork (large, multicolor)
+     * @param condition: weather condition code as downloaded from OWM
+     * @return integer reference to drawable. -1 if not found.
+     */
+    public static int getWeatherConditionArt(int condition) {
+
+        if (condition < 200 || condition >= 900) return -1;
+
+        else if (condition >= 200 && condition <= 233) return R.drawable.art_storm;
+        else if (condition >= 300 && condition <= 321) return R.drawable.art_light_rain;
+        else if (condition >= 500 && condition <= 531) return R.drawable.art_rain;
+        else if (condition >= 600 && condition <= 622) return R.drawable.art_snow;
+        else if (condition >= 700 && condition <= 781) return R.drawable.art_fog;
+        else if (condition == 800)                     return R.drawable.art_clear;
+        else if (condition == 801)                     return R.drawable.art_light_clouds;
+        else if (condition >= 802 && condition <= 804) return R.drawable.art_clouds;
+        else    return -1;
+    }
+
 }
