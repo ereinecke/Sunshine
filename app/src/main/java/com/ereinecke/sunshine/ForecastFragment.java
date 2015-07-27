@@ -36,7 +36,6 @@ import android.widget.ListView;
 
 import com.ereinecke.sunshine.data.WeatherContract;
 
-
 /**
  * ForecastFragment
  * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.

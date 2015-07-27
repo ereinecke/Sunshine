@@ -18,6 +18,7 @@ package com.ereinecke.sunshine;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -44,10 +45,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
+    static final String DETAIL_URI = "URI";
     private static final int DETAIL_LOADER = 0;
 
     private ShareActionProvider mShareActionProvider;
     private String mForecast;
+    private Uri mUri;
 
     // Projection for content provider query
     private static final String [] DETAIL_COLUMNS = {
@@ -87,6 +90,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mPressureView;
 
     public DetailFragment() {
+
         setHasOptionsMenu(true);
     }
 
@@ -94,6 +98,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
+        }
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         mIconView = (ImageView) rootView.findViewById(R.id.detail_icon);
@@ -107,6 +115,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mPressureView = (TextView) rootView.findViewById(R.id.detail_pressure_textview);
 
         return rootView;
+    }
+
+    void onLocationChanged(String newLocation) {
+        // Replace the Uri, since the location has changed
+        Uri uri = mUri;
+        if (null != uri) {
+            long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
+            Uri updateUri = WeatherContract.WeatherEntry
+                    .buildWeatherLocationWithDate(newLocation, date);
+            mUri = updateUri;
+            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+        }
     }
 
     @Override
@@ -145,12 +165,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "In onCreateLoader");
-        Intent intent = getActivity().getIntent();
-        if (intent == null) return null;
-
-        // Create and return CursorLoader
-        return new CursorLoader(getActivity(), intent.getData(), DETAIL_COLUMNS,
-                null, null, null);
+        if (null != mUri) {
+            // Create and return CursorLoader
+            return new CursorLoader(getActivity(), mUri, DETAIL_COLUMNS,
+                    null, null, null);
+        }
+        return null;
     }
 
     @Override
@@ -186,6 +206,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             // read humidity from cursor and update view
             float humidity = data.getFloat(COL_WEATHER_HUMIDITY);
+            Log.d(LOG_TAG, "Humidity: " + humidity);
             mHumidityView.setText(getActivity().getString(R.string.format_humidity, humidity));
 
             // read wind speed and direction from cursor and update view
@@ -198,7 +219,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mPressureView.setText(getActivity().getString(R.string.format_pressure, pressure));
 
             // We still need this for the share intent
-            mForecast = String.format("%s - %s - %s/%s", dateText, description, high, low);
+            mForecast = String.format("%s - %s - %.0f/%.0f", dateText, description, high, low);
 
             if (mShareActionProvider != null) {
                 mShareActionProvider.setShareIntent(createShareForecastIntent());

@@ -193,6 +193,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
                 pressure = dayForecast.getDouble(OWM_PRESSURE);
                 humidity = dayForecast.getInt(OWM_HUMIDITY);
+                Log.d(LOG_TAG,"Humidity: " + humidity);
                 windSpeed = dayForecast.getDouble(OWM_WINDSPEED);
                 windDirection = dayForecast.getDouble(OWM_WIND_DIRECTION);
 
