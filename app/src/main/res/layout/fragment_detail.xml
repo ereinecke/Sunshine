@@ -15,7 +15,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/scrollView" >
+        android:id="@+id/scrollView">
 
         <LinearLayout
             android:orientation="vertical"
@@ -28,7 +28,10 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/detail_day_textview"
                 android:paddingBottom="@dimen/activity_small_text_padding"
-                android:paddingTop="@dimen/activity_small_text_padding" />
+                android:paddingTop="@dimen/activity_small_text_padding"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="24sp"
+                android:textColor="#000000" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -36,7 +39,10 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/detail_date_textview"
                 android:paddingBottom="@dimen/activity_small_text_padding"
-                android:paddingTop="@dimen/activity_small_text_padding" />
+                android:paddingTop="@dimen/activity_small_text_padding"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="#646464"
+                android:textSize="16sp" />
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -57,7 +63,10 @@
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:id="@+id/detail_high_textview"
                         android:layout_weight="3"
-                        android:gravity="center_vertical|left|right" />
+                        android:gravity="center_horizontal"
+                        android:fontFamily="sans-serif-light"
+                        android:textSize="96sp"
+                        android:layout_gravity="center_horizontal" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -65,8 +74,11 @@
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:id="@+id/detail_low_textview"
                         android:layout_weight="2"
-                        android:gravity="center_vertical|left|right"
-                        android:paddingTop="@dimen/activity_small_text_padding" />
+                        android:fontFamily="sans-serif-light"
+                        android:textColor="#646464"
+                        android:textSize="48sp"
+                        android:layout_gravity="center_horizontal|top"
+                        android:gravity="center_horizontal|top" />
 
                 </LinearLayout>
 
@@ -90,7 +102,10 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:id="@+id/detail_forecast_textview"
-                        android:paddingTop="@dimen/activity_small_text_padding" />
+                        android:paddingTop="@dimen/activity_small_text_padding"
+                        android:fontFamily="sans-serif-condensed"
+                        android:textColor="#646464"
+                        android:textSize="@dimen/abc_text_size_large_material" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -101,7 +116,9 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/detail_humidity_textview"
                 android:paddingTop="@dimen/activity_small_text_padding"
-                android:paddingBottom="@dimen/activity_small_text_padding" />
+                android:paddingBottom="@dimen/activity_small_text_padding"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="@dimen/abc_text_size_large_material" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -109,7 +126,9 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/detail_windspeed_textview"
                 android:paddingTop="@dimen/activity_small_text_padding"
-                android:paddingBottom="@dimen/activity_small_text_padding" />
+                android:paddingBottom="@dimen/activity_small_text_padding"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="@dimen/abc_text_size_large_material" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -117,7 +136,9 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/detail_pressure_textview"
                 android:paddingTop="@dimen/activity_small_text_padding"
-                android:paddingBottom="@dimen/activity_small_text_padding" />
+                android:paddingBottom="@dimen/activity_small_text_padding"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="@dimen/abc_text_size_large_material" />
 
         </LinearLayout>
     </ScrollView>
