@@ -1,0 +1,15 @@
+Sunshine pending issues                 7/29/15
+
+
+- Having a big issue with implementing Material via AppCompat on API 17.  Get a Halo dark
+background.  ActionBar is also black.
+
+- First item should be selected when opening (or refreshing?) in Tablet view.
+
+- Need to implement phone layout on 7" portrait.
+
+- Add location name, lat & long to details screen
+
+- Create a control that displays windspeed & direction graphically
+
+- Add descriptions for accessibility
